@@ -10,8 +10,9 @@ The ChatBot .NET application featured here allows you to order flowers using Ama
 
 ----------
 
+##**AWS Services**
 
-###The **AWS services** used to implement this web ChatBot application are: 
+The **AWS services** used to implement this web ChatBot application are: 
 
  - [Amazon Lex][2]: Text based conversational chatbots 
  - [Amazon Cognito][3]: Amazon Cognito Federated Identities feature 
@@ -20,6 +21,7 @@ The ChatBot .NET application featured here allows you to order flowers using Ama
  - [Amazon EC2][5]: Virtual compute instances for
    running Linux and Windows instances
 
+##**Repo Structure**
 The repo is organized as follows:
 
 **Code folder:** Contains the ASP.NET Core MVC Web Application solution and corresponding code files
