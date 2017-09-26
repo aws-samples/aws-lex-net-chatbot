@@ -1,0 +1,120 @@
+﻿@*
+  Comments  
+*@
+@model IEnumerable<dotnetLexChatBot.Models.ChatBotMessage>
+@{
+    ViewData["Title"] = ".NET Lex ChatBot";
+}
+
+<html>
+
+<head>
+    <title>.NET Amazon Lex ChatBot - Sample Application (BookTrip)</title>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.41.0.min.js"></script>
+    <style language="text/css">
+        input#wisdom {
+            padding: 4px;
+            font-size: 1em;
+            width: 400px
+        }
+
+        input::placeholder {
+            color: #ccc;
+            font-style: italic;
+        }
+
+        ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+            color: #ccc;
+            font-style: italic;
+        }
+
+        :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color: #ccc;
+            font-style: italic;
+        }
+
+        ::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color: #909;
+            opacity: 1;
+        }
+
+        :-ms-input-placeholder { /* Internet Explorer 10-11 */
+            color: #ccc;
+            font-style: italic;
+        }
+
+        ::-ms-input-placeholder { /* Microsoft Edge */
+            color: #ccc;
+            font-style: italic;
+        }
+
+        dt.userRequest {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            min-width: 50%;
+            max-width: 85%;
+            float: left;
+            background-color: #7d7;
+        }
+
+        dd.lexResponse {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            text-align: right;
+            min-width: 50%;
+            max-width: 85%;
+            float: right;
+            background-color: #bbf;
+            font-style: italic;
+        }
+
+        p.lexError {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            text-align: right;
+            min-width: 50%;
+            max-width: 85%;
+            float: right;
+            background-color: #f77;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>A .NET ChatBot Using Lex</h1>
+
+    <p>Hello from the View Template</p>
+    <h2 style="text-align:  left">Amazon Lex - BookTrip</h2>
+    <p style="width: 400px">
+        This little chatbot shows how easy it is to incorporate
+        <a href="https://aws.amazon.com/lex/" title="Amazon Lex (product)" target="_new">Amazon Lex</a> into your web pages.  Try it out.
+    </p>
+    <div id="conversation" style="width: 400px; height: 400px; border: 1px solid #ccc; background-color: #eee; padding: 4px; overflow: scroll">
+        <dl>
+            @foreach (var ChatMsg in Model)
+            {
+                if (ChatMsg.MsgType == dotnetLexChatBot.Models.MessageType.UserMessage)
+                {
+                    <dt class="userRequest">@ChatMsg.ChatMessage</dt>
+                }
+                else
+                {
+                    <dd class="lexResponse">@ChatMsg.ChatMessage</dd>
+                }
+            }  
+            
+        </dl>
+    </div>
+    @using (Html.BeginForm("GetChatMessage","HelloChatBot"))
+    {
+        <input type="text" size="80" name="userMessage" placeholder="I need a hotel room"/>
+    }
+    <!--
+    <form id="chatform" style="margin-top: 10px" onsubmit="return pushChat();">
+        <input type="text" id="wisdom" size="80" value="" placeholder="I need a hotel room">
+    </form>-->
+</body>
+</html>

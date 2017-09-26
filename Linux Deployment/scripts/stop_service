@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# stop apache
+systemctl stop apache2.service
+
+# stop dotnet application
+SERVICE_ROOT=/home/ubuntu/aspnetlexchatbot
+PID_FILE=$SERVICE_ROOT/service.pid
+
+if [ -f $PID_FILE ]; then
+    cat $PID_FILE | xargs kill -9
+    rm $PID_FILE
+fi

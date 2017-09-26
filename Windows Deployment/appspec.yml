@@ -1,0 +1,21 @@
+version: 0.0
+os: windows 
+files:
+  - source: dotnetLexChatBot/build_output
+    destination: C:\Users\Administrator\aspnetlexchatbot
+hooks:
+  ApplicationStop:
+    - location: \scripts\stop_service.bat
+      timeout: 300
+
+  BeforeInstall:
+    - location: \scripts\before-install.bat
+      timeout: 300
+  
+  AfterInstall:
+    - location: \scripts\after-install.bat
+      timeout: 300
+
+  ApplicationStart:
+    - location: \scripts\start_service.bat
+      timeout: 300

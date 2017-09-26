@@ -1,0 +1,19 @@
+#!/bin/bash
+cd /home/ubuntu/
+
+# start apache
+systemctl restart apache2.service
+
+SERVICE_ROOT=/home/ubuntu/aspnetlexchatbot
+PID_FILE=$SERVICE_ROOT/service.pid
+
+# shut down sevice if it is running already
+if [! -f $PID_FILE]; then
+    cat $PID_FILE | xargs kill -9
+    rm $PID_FILE
+fi
+
+# un asp.core application
+cd $SERVICE_ROOT
+dotnet dotnetLexChatBot.dll &>$SERVICE_ROOT/service.log &
+echo $! > $SERVICE_ROOT/service.pid

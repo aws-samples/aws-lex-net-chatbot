@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+@*
+    Comments
+*@
+@model IEnumerable<dotnetLexChatBot.Models.ChatBotMessage>
+@{
+    Layout = null;
+    ViewData["Title"] = ".NET Lex ChatBot";
+}
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>.NET Amazon Lex ChatBot - Sample Application (OrderFlowers)</title>
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.41.0.min.js"></script>
+        <script src="~/js/chatbot/jquery-1.10.2.js" type="text/javascript"></script>
+        <script src="~/js/chatbot/jquery-ui-1.10.4.custom.min.js" type="text/javascript"></script>
+        <script src="~/js/chatbot/bootstrap.js" type="text/javascript"></script>
+        <script src="~/js/chatbot/awesome-landing-page.js" type="text/javascript"></script>
+        <style language="text/css">
+            input#wisdom {
+                padding: 4px;
+                font-size: 1em;
+                width: 400px
+            }
+
+            input::placeholder {
+                color: #ccc;
+                font-style: italic;
+            }
+
+            ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+                color: #ccc;
+                font-style: italic;
+            }
+
+            :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+                color: #ccc;
+                font-style: italic;
+            }
+
+            ::-moz-placeholder { /* Mozilla Firefox 19+ */
+                color: #909;
+                opacity: 1;
+            }
+
+            :-ms-input-placeholder { /* Internet Explorer 10-11 */
+                color: #ccc;
+                font-style: italic;
+            }
+
+            ::-ms-input-placeholder { /* Microsoft Edge */
+                color: #ccc;
+                font-style: italic;
+            }
+
+            dt.userRequest {
+                margin: 4px;
+                padding: 4px 10px 4px 10px;
+                border-radius: 4px;
+                min-width: 50%;
+                max-width: 85%;
+                float: left;
+                background-color: #7d7;
+            }
+
+            dd.lexResponse {
+                margin: 4px;
+                padding: 4px 10px 4px 10px;
+                border-radius: 4px;
+                text-align: right;
+                min-width: 50%;
+                max-width: 85%;
+                float: right;
+                background-color: #bbf;
+                font-style: italic;
+            }
+
+            p.lexError {
+                margin: 4px;
+                padding: 4px 10px 4px 10px;
+                border-radius: 4px;
+                text-align: right;
+                min-width: 50%;
+                max-width: 85%;
+                float: right;
+                background-color: #f77;
+            }
+        </style>
+        <link href="~/css/chatbot/bootstrap.css" rel="stylesheet" />
+        <link href="~/css/chatbot/landing-page.css" rel="stylesheet" />
+        <!--     Fonts and icons     -->
+        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300' rel='stylesheet' type='text/css'>
+        <link href="~/css/chatbot/pe-icon-7-stroke.css" rel="stylesheet" />
+    </head>
+    <body class="landing-page landing-page1">
+        <div class="wrapper">
+            <div class="parallax filter-gradient blue" data-color="blue">
+                <div class="parallax-background">
+                    <img class="parallax-background-image" src="~/images/bg3.jpg">
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="parallax-image">
+                                <div id="chatheader" style="width: 400px;height: 60px;border: 1px solid gray;background-color: cadetblue;border-radius: 10px">
+                                    <img src="~/images/awspowered-sm.png" style="float:left; margin-top:2px;max-height:95%; max-width:20%;border: 1px solid #7b7b7b;border-radius: 50%;"/>
+                                    <h4 style="margin-top:15px;float:left;padding-left:5px;color:white">Order Flowers</h4>
+                                </div>
+                                <div id="conversation" style="width: 400px; height: 450px; border: 2px solid gray;background-color: #ffffff; overflow: scroll;object-position:bottom">
+                                    <dl>
+                                        @foreach (var ChatMsg in Model)
+                                        {
+                                            if (ChatMsg.MsgType == dotnetLexChatBot.Models.MessageType.UserMessage)
+                                            {
+                                            <dt class="userRequest">@ChatMsg.ChatMessage</dt>
+                                            }
+                                            else
+                                            {
+                                            <dd class="lexResponse">@ChatMsg.ChatMessage</dd>
+                                            }
+                                        }
+                                    </dl>
+                                </div>
+                                @{
+                                    <script>
+                                        var chatDiv = document.getElementById("conversation");
+                                        chatDiv.scrollTop = chatDiv.scrollHeight;
+                                    </script>
+
+                                    var htmlAttributes = new Dictionary<string, object>();
+                                    htmlAttributes.Add("class", "form-inline");
+                                }
+
+                                @using (Html.BeginForm("GetChatMessage","HelloChatBot",FormMethod.Post, htmlAttributes))
+                                {
+                                    <div class="form-group">
+                                        <input class="form-control" name="userMessage" type="text" placeholder="I want to order flowers" style="float:left;width:400px;z-index:-1;background-color: #ffffff;height:39px"/>
+                                        <a asp-action="ClearBot" class="btn btn-default" role="button" style="background-color:cadetblue;float:right;margin-top:-39px;color:white">Clear</a>
+                                    </div>
+                                }
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="col-md-6 col-md-offset-1">
+                            <div class="description">
+                                <h2>.NET ChatBot with Amazon Lex</h2>
+                                <br>
+                                <h5>Build a .NET chatbot using ASP.NET Core and Amazon Lex! This Chat bot allows you to order flowers using Amazon Lex. To start using this bot you can type "I want to order flowers", "Order Flowers" or a similiar utterance. 
+                                3 types of flowers are supported: Roses, Lilies, Tulips. 
+                                Time must be noted with PM/AM and dates can be noted with day i.e. Wednesday or Next Wednesday.</h5>
+                            </div>
+                            <div class="buttons">
+                                <button class="btn btn-fill btn-neutral">
+                                    <a style="color:gray" target="_blank" href="http://aws.amazon.com/lex">Amazon Lex</a>
+                                </button>
+                                <button class="btn btn-fill btn-neutral">
+                                    .NET Core
+                                </button>
+                                <button class="btn btn-fill btn-neutral">
+                                    AWS Lambda
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

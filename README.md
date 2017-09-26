@@ -30,7 +30,9 @@ The repo is organized as follows:
 
 **Linux Deployment:** Scripts needed to create an EC2 Instance running the Linux OS and to deploy the ASP.NET Core web application 
 
- **Windows Deployment:** Scripts needed to create an EC2 Instance running the Windows OS and to deploy the ASP.NET Core web application 
+**Windows Deployment:** Scripts needed to create an EC2 Instance running the Windows OS and to deploy the ASP.NET Core web application 
+
+**CloudFormation Template:** CloudFormation template provided to assist with setup of ChatBot on AWS including the configuration of the AWS Services needed.
 
 
   [1]: https://aws.amazon.com/visualstudio/
