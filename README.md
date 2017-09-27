@@ -1,5 +1,7 @@
 # aws-lex-net-chatbot
-The ChatBot .NET application featured here allows you to order flowers using Amazon Lex. The application is an ASP.NET Core MVC web application using AWS .NET SDK and the [AWS Toolkit for Visual Studio][1]
+The ChatBot .NET application featured here allows you to order flowers using Amazon Lex. The application is an ASP.NET Core MVC web application using AWS .NET SDK and the [AWS Toolkit for Visual Studio][1].  
+
+When you are ready to explore building your own Amazon Lex ChatBot. The code provided can be easily used to connect to any ChatBot created with Amazon Lex, and deploy the bot to web.
 
 
 ----------
