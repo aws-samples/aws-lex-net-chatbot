@@ -76,6 +76,11 @@
                 font-style: italic;
             }
 
+            td.button-cell {
+                margin: 4px;
+                padding: 4px 10px 4px 10px;
+            }
+
             p.lexError {
                 margin: 4px;
                 padding: 4px 10px 4px 10px;
@@ -136,7 +141,7 @@
                                 @using (Html.BeginForm("GetChatMessage","HelloChatBot",FormMethod.Post, htmlAttributes))
                                 {
                                     <div class="form-group">
-                                        <input class="form-control" name="userMessage" type="text" placeholder="I want to order flowers" style="float:left;width:400px;z-index:-1;background-color: #ffffff;height:39px"/>
+                                        <input class="form-control" name="userMessage" type="text" placeholder="Enter your chat here" style="float:left;width:400px;z-index:-1;background-color: #ffffff;height:39px"/>
                                         <a asp-action="ClearBot" class="btn btn-default" role="button" style="background-color:cadetblue;float:right;margin-top:-39px;color:white">Clear</a>
                                     </div>
                                 }
@@ -145,23 +150,37 @@
                         </div>
                         
                         <div class="col-md-6 col-md-offset-1">
-                            <div class="description">
+                            <div class="description" style="margin-top:100px">
                                 <h2>.NET ChatBot with Amazon Lex</h2>
                                 <br>
-                                <h5>Build a .NET chatbot using ASP.NET Core and Amazon Lex! This Chat bot allows you to order flowers using Amazon Lex. To start using this bot you can type "I want to order flowers", "Order Flowers" or a similiar utterance. 
-                                3 types of flowers are supported: Roses, Lilies, Tulips. 
-                                Time must be noted with PM/AM and dates can be noted with day i.e. Wednesday or Next Wednesday.</h5>
+                                <h5>Build a .NET Chatbot using ASP .NET Core and Amazon Lex! This chatbot allows you to order flowers. To start using this bot simply type “I want to order flowers”, “Order Flowers” or a similar utterance. This simple chatbot currently is designed to follow three instructions,  type of flowers, day for pick up  and time for pick up. You can input three types of flowers: Roses, Lilies, and Tulips. You may enter a date or a  day for pick-up i.e. Wednesday or Next Wednesday. We challenge you to take this simple example, add more details and customize it for your use case </h5>
                             </div>
-                            <div class="buttons">
-                                <button class="btn btn-fill btn-neutral">
-                                    <a style="color:gray" target="_blank" href="http://aws.amazon.com/lex">Amazon Lex</a>
-                                </button>
-                                <button class="btn btn-fill btn-neutral">
-                                    .NET Core
-                                </button>
-                                <button class="btn btn-fill btn-neutral">
-                                    AWS Lambda
-                                </button>
+                            <div class="buttons" style="margin-top:20px">
+                                <table>
+                                    <tr>
+                                        <td class="button-cell">
+                                            <form action="http://aws.amazon.com/lex">
+                                                <button type="submit" class="btn btn-fill btn-neutral">
+                                                    Amazon Lex
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td class="button-cell">
+                                            <form action="http://aws.amazon.com/sdk-for-net">
+                                                <button type="submit" class="btn btn-fill btn-neutral">
+                                                    AWS SDK for .NET
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td class="button-cell">
+                                            <form action="http://aws.amazon.com/lambda">
+                                                <button class="btn btn-fill btn-neutral">
+                                                    AWS Lambda
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
