@@ -18,7 +18,7 @@
     "update-shrinkwrap": "npm shrinkwrap --dev && shx mv ./npm-shrinkwrap.json ./grunt/npm-shrinkwrap.json",
     "test": "grunt test"
   },
-  "style": "dist/css/bootstrap.css",
+  "style": "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
   "less": "less/bootstrap.less",
   "main": "./dist/js/npm",
   "repository": {
