@@ -1,5 +1,5 @@
 ﻿/*******************************************************************************
-* Copyright 2009-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+* Copyright 2009-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 * 
 * Licensed under the Apache License, Version 2.0 (the "License"). You may
 * not use this file except in compliance with the License. A copy of the
@@ -14,16 +14,12 @@
 *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Text.Encodings.Web;
 using dotnetLexChatBot.Models;
 using dotnetLexChatBot.Data;
-using System.Net.Http;
-using System.Xml;
-using Microsoft.Extensions.Options;
+using Amazon.Lex;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -95,8 +91,27 @@ namespace dotnetLexChatBot.Controllers
             var lexResponse = await awsLexSvc.SendTextMsgToLex(userMessage, lexSessionData, userSessionID);
 
             lexSessionData = lexResponse.SessionAttributes;
-            botMessages.Add(new ChatBotMessage()
-            { MsgType = MessageType.LexMessage, ChatMessage = lexResponse.Message });
+            if (
+                lexResponse.DialogState == DialogState.ElicitSlot ||
+                lexResponse.DialogState == DialogState.ConfirmIntent
+            ) {
+                botMessages.Add(
+                    new ChatBotMessage()
+                    { 
+                        MsgType = MessageType.LexMessage, 
+                        ChatMessage = lexResponse.Message 
+                    });
+            } else if (
+                lexResponse.DialogState == DialogState.ReadyForFulfillment ||
+                lexResponse.DialogState == DialogState.Fulfilled
+            ) {
+                botMessages.Add(
+                    new ChatBotMessage()
+                    { 
+                        MsgType = MessageType.LexMessage, 
+                        ChatMessage = lexResponse.Message ?? "Your order is being processed. Thank you for your business!"
+                    });
+            }
 
             //Add updated botMessages and lexSessionData object to Session
             userHttpSession.Set<List<ChatBotMessage>>(botMsgKey, botMessages);
