@@ -23,7 +23,8 @@ GEM
       addressable (~> 2.4.0)
     jekyll-watch (1.5.1)
       listen (~> 3.0)
-    kramdown (1.17.0)
+    kramdown (2.3.0)
+      rexml
     liquid (4.0.3)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -34,6 +35,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rexml (3.2.4)
     rouge (2.2.1)
     safe_yaml (1.0.5)
     sass (3.7.4)
