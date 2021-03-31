@@ -6,34 +6,50 @@ Conditions:
 Description: An ASP.NET Core ChatBot Application.
 Mappings:
   RegionMap: 
-    us-west-2: 
-      "ubuntu": "ami-835b4efa"
-      "windows": "ami-835b4efa"
-    us-east-1: 
-      "ubuntu": "ami-d15a75c7"
-      "windows": "ami-835b4efa"
-    eu-west-1: 
-      "ubuntu": "ami-6d48500b"
-      "windows": "ami-835b4efa"
+    us-east-2:
+      BucketName: "aws-codedeploy-us-east-2"
+    us-east-1:  
+      BucketName: "aws-codedeploy-us-east-1"
+    us-west-1:  
+      BucketName: "aws-codedeploy-us-west-1"
+    us-west-2:  
+      BucketName: "aws-codedeploy-us-west-2"
+    ca-central-1:  
+      BucketName: "aws-codedeploy-ca-central-1"
+    eu-west-1:  
+      BucketName: "aws-codedeploy-eu-west-1"
+    eu-west-2:  
+      BucketName: "aws-codedeploy-eu-west-2"
+    eu-west-3:  
+      BucketName: "aws-codedeploy-eu-west-3"
+    eu-central-1:  
+      BucketName: "aws-codedeploy-eu-central-1"
+    ap-east-1:  
+      BucketName: "aws-codedeploy-ap-east-1"
+    ap-northeast-1:  
+      BucketName: "aws-codedeploy-ap-northeast-1"
+    ap-northeast-2:  
+      BucketName: "aws-codedeploy-ap-northeast-2"
+    ap-southeast-1:  
+      BucketName: "aws-codedeploy-ap-southeast-1"
+    ap-southeast-2:  
+      BucketName: "aws-codedeploy-ap-southeast-2"
+    ap-south-1:  
+      BucketName: "aws-codedeploy-ap-south-1"
+    sa-east-1:  
+      BucketName: "aws-codedeploy-sa-east-1"
 Metadata:
   AWS::CloudFormation::Interface:
-    ParameterGroups: [{Label: {default: Application}, Parameters: [ProjectId, AppName]}, {Label: {default: GitHub}, Parameters: [GitHubOwner, GitHubOAuthToken, GitHubRepo]}]
-  CodeBuildImage: aws/codebuild/dot-net:core-1
+    ParameterGroups: [{Label: {default: Application}, Parameters: [ProjectId, AppName]}, {Label: {default: GitHub}, Parameters: [GitHubOwner, GitHubOAuthToken, GitHubRepo]}, {Label: {default: VPC}, Parameters: [VpcId, SubnetId]}]
+  CodeBuildImage: aws/codebuild/amazonlinux2-x86_64-standard:3.0
   CreateCodeBuild: true
   ProjectTemplateId: webapp-netcore-ec2
   WebsiteS3Bucket: AWS::NoValue
 Outputs:
   URL:
     Description: The URL for the ASP.NET Core web application deployed on an Amazon EC2 instance.
-    Value: !Join ['', ['http://', !GetAtt [WebApp01, PublicDnsName], /]]
+    Value: !Sub 'http://${WebApp01.PublicDnsName}/'
 Parameters:
-  OSType: 
-      Description: Operating system
-      Type: String
-      Default: ubuntu
-      AllowedValues: 
-        - ubuntu
-        - windows
   GitHubOwner:
     Description: 'The owner of the GitHub repository.'
     Type: String
@@ -52,6 +68,9 @@ Parameters:
     Default: t2.micro
     Description: The Amazon EC2 instance type to use.
     Type: String
+  LatestAmiId:
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
   KeyPairName:
     Description: The name of the key pair used to make SSH connections to Amazon EC2 instances.
     Type: AWS::EC2::KeyPair::KeyName
@@ -62,12 +81,12 @@ Parameters:
     MaxLength: 15
     MinLength: 2
     Type: String
-  SubnetId:
-    Description: The name of the VPC public subnet to use for Amazon EC2 instances launched for this project.
-    Type: AWS::EC2::Subnet::Id
   VpcId:
     Description: The ID of the Amazon Virtual Private Cloud (VPC) to use for Amazon EC2 instances.
     Type: AWS::EC2::VPC::Id
+  SubnetId:
+    Description: The name of the VPC public subnet to use for Amazon EC2 instances launched for this project.
+    Type: AWS::EC2::Subnet::Id
 Resources:
   CodeBuildPolicy:
     Condition: CreateCodeBuildResources
@@ -237,59 +256,54 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
     Type: AWS::S3::Bucket
+  InstanceWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  InstanceWaitCondition: 
+    Type: AWS::CloudFormation::WaitCondition
+    Properties: 
+      Handle: !Ref InstanceWaitHandle
+      Timeout: 1200
+      Count: 1
   WebApp01:
+    Type: AWS::EC2::Instance
+    DependsOn: InstanceWaitHandle
     Description: Creating Amazon EC2 instances
     Properties:
       IamInstanceProfile: !Ref 'WebAppInstanceProfile'
-      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", !Ref OSType]
+      ImageId: !Ref LatestAmiId
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyPairName'
       NetworkInterfaces: [{AssociatePublicIpAddress: true, DeviceIndex: 0, GroupSet: [
             !Ref 'WebAppSG'], SubnetId: !If [UseSubnet, !Ref 'SubnetId', !Ref 'AWS::NoValue']}]
-      Tags: [{Key: Environment, Value: !Join ['', [!Ref 'ProjectId', -WebApp]]}, {
-          Key: Name, Value: !Join ['', [!Ref 'ProjectId', -WebApp]]}]
-      UserData: !Base64
-        Fn::Join: ['', ['#!/bin/bash -ex
-
-              ', 'wget -O /usr/local/bin/get_authorized_keys https://s3-us-west-2.amazonaws.com/awscodestar-remote-access-us-west-2/get_authorized_keys
-
-              ', 'chmod 755 /usr/local/bin/get_authorized_keys
-
-              ', 'echo ''AuthorizedKeysCommand /usr/local/bin/get_authorized_keys''
-              >> /etc/ssh/sshd_config
-
-              ', 'echo ''AuthorizedKeysCommandUser root'' >> /etc/ssh/sshd_config
-
-              ', 'service sshd restart
-
-              ', 'apt-get update -y
-
-              ', 'apt-get install python-pip -y
-
-              ', 'pip install --upgrade --user awscli
-
-              ', 'apt-get install ruby -y
-
-              ', '# Install the AWS CodeDeploy Agent.
-
-              ', 'cd /home/ubuntu/
-
-              ', 'wget https://aws-codedeploy-', !Ref 'AWS::Region', '.s3.amazonaws.com/latest/install
-
-              ', 'mv ./install ./install-codedeploy-agent
-
-              ', 'chmod +x ./install-codedeploy-agent
-
-              ', './install-codedeploy-agent auto
-
-              ', '# Install pip and python dev libraries.
-
-              ', 'pip install boto3
-
-              ', 'pip install boto
-
-              ', pip install pycrypto]]
-    Type: AWS::EC2::Instance
+      Tags: 
+        - Key: Environment
+          Value: !Sub "${ProjectId}-WebApp" 
+        - Key: Name
+          Value: !Sub "${ProjectId}-WebApp" 
+      UserData:
+        Fn::Base64:
+          Fn::Sub: 
+            - |
+              <powershell>
+              $VerbosePreference = "Continue"
+              try {
+                Import-Module AWSPowerShell
+                New-Item -Path "C:\Temp" -ItemType Directory -Force
+                Write-Verbose "Downloading CodeDeploy installer..."
+                Read-S3Object -BucketName ${BucketName} -Key latest/codedeploy-agent.msi -File C:\Temp\codedeploy-agent.msi
+                Write-Verbose "Installing CodeDeploy Agent..."
+                Start-Process msiexec.exe -Wait -ArgumentList '/I', 'C:\Temp\codedeploy-agent.msi', '/quiet', '/l', 'C:\Temp\host-agent-install-log.txt'
+                Write-Verbose "Done! Signaling completion to WaitHandle"
+                Invoke-WebRequest -Method PUT -Body $( ConvertTo-Json @{ "Status" = "SUCCESS"; "UniqueId"=[System.Guid]::NewGuid(); "Data"="Instance initialized successfully." } ) -Uri "${ InstanceWaitHandle }"
+              }
+              catch {
+                Write-Host "ERROR: $($_.Exception.ItemName):$($_.Exception.Message)"
+                Invoke-WebRequest -Method PUT -Body $( ConvertTo-Json @{ "Status" = "FAILURE"; "UniqueId"=[System.Guid]::NewGuid(); "Data"="$($_.Exception.Message)" } ) -Uri "${ InstanceWaitHandle }"
+              }
+              </powershell>
+            - {
+              BucketName: !FindInMap [ RegionMap, !Ref 'AWS::Region', BucketName ]
+              }
   WebAppInstanceProfile:
     Description: Creating Amazon EC2 instance profile for instances
     Properties:
@@ -334,7 +348,7 @@ Resources:
     Properties:
       GroupDescription: Enable HTTP access via port 80 and SSH access via port 22.
       SecurityGroupIngress: [{CidrIp: 0.0.0.0/0, FromPort: 80, IpProtocol: tcp, ToPort: 80},
-        {CidrIp: 0.0.0.0/0, FromPort: 22, IpProtocol: tcp, ToPort: 22}]
+        {CidrIp: 0.0.0.0/0, FromPort: 3389, IpProtocol: tcp, ToPort: 3389}]
       VpcId: !Ref 'VpcId'
     Type: AWS::EC2::SecurityGroup
 
